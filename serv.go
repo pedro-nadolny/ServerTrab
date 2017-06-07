@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -16,9 +15,14 @@ import (
 const banco = "sd20171:sd20171@/sd20171"
 
 type Randonneur struct {
-	Nome  string        `json:"nome"`
-	Tempo time.Duration `json:"tempo"`
-	Media float32       `json:"media"`
+	Id      int    `json:"id"`
+	Nome    string `json:"nome"`
+	Email   string `json:"email"`
+	Idade   int    `json:"idade"`
+	Points  int    `json:"points"`
+	CheckIn bool   `json:"checkIn`
+	Balada  string `json:"balada"`
+	Estilo  string `json:"estilo"`
 }
 type Id string
 
@@ -40,7 +44,7 @@ func handleRandonneurs(resp http.ResponseWriter, req *http.Request) {
 	defer bd.Close()
 
 	/* efetua a consulta */
-	r, err := bd.Query("select * from WILLIAN;")
+	r, err := bd.Query("select * from USERBALADEIRO;")
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(resp, err.Error(),
@@ -76,7 +80,7 @@ func handleRandonneurs(resp http.ResponseWriter, req *http.Request) {
 
 func (self Id) Exclui(resp http.ResponseWriter, req *http.Request, bd *sql.DB) {
 	id := string(self)
-	cmd, err := bd.Prepare("delete from WILLIAN where placa = ?;")
+	cmd, err := bd.Prepare("delete from USERBALADEIRO where id = ?;")
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
@@ -116,8 +120,8 @@ func handleRandonneur(resp http.ResponseWriter, req *http.Request) {
 func (self Id) Insere(resp http.ResponseWriter, req *http.Request, bd *sql.DB) {
 	id := string(self)
 	randonneur := new(Randonneur)
-	cmd, err := bd.Prepare(`insert into WILLIAN
-(placa, nome, tempo, media)
+	cmd, err := bd.Prepare(`insert into USERBALADEIRO
+(id, nome, email, idade, points, checkIn, balada, estilo)
 values (?, ?, ?, ?);`)
 	if err != nil {
 		log.Println(err.Error())
@@ -151,7 +155,7 @@ values (?, ?, ?, ?);`)
 func (self Id) Atualiza(resp http.ResponseWriter, req *http.Request, bd *sql.DB) {
 	id := string(self)
 	randonneur := new(Randonneur)
-	cmd, err := bd.Prepare(`update WILLIAN
+	cmd, err := bd.Prepare(`update USERBALADEIRO
 	set nome = ?, tempo = ?, media = ?
 	where placa = ?;`)
 	if err != nil {
@@ -183,7 +187,7 @@ func (self Id) Visualiza(resp http.ResponseWriter,
 	req *http.Request, bd *sql.DB) {
 	id := string(self)
 	randonneur := new(Randonneur)
-	r := bd.QueryRow(`select nome, tempo, media from WILLIAN where placa = ?;`, id)
+	r := bd.QueryRow(`select nome, tempo, media from USERBALADEIRO where placa = ?;`, id)
 	err := r.Scan(&randonneur.Nome, &randonneur.Tempo, &randonneur.Media)
 	if err != nil {
 		resp.WriteHeader(http.StatusNotFound)
