@@ -203,5 +203,5 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/brm", handleRandonneurs).Methods("GET")
 	router.HandleFunc("/brm/{id}", handleRandonneur).Methods("GET", "DELETE", "POST", "PUT")
-	log.Fatal(http.ListenAndServe(":9998", router))
+	log.Fatal(http.ListenAndServe(":9999", router))
 }
